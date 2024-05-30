@@ -28,6 +28,6 @@ class RedactingFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         """ function formats the log message """
-        msg = super(RedactingFormatter, self).format(record)
+        msg = super(RedactingFormatter, self).format(record=record)
         f_msg = filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
         return f_msg
