@@ -1,100 +1,47 @@
 #!/usr/bin/env python3
-"""
-Defines a logger with custom log formatter
-"""
-import os
+""" Regex-in function """
 import re
-import logging
 from typing import List, Tuple
+import logging
 
-import mysql.connector
-
-
-PII_FIELDS: Tuple[str] = ('name', 'email', 'phone', 'ssn', 'password')
+PII_FIELDS: Tuple[str] = ("name", "email", "phone", "ssn", "password")
 
 
-def filter_datum(
-    fields: List[str], redaction: str,
-    message: str, separator: str
-) -> str:
-    """
-    Filters message by replacing each value in fields with redaction
-    """
-    for key in fields:
-        pattern = r'({0}=)[^{1}]*({1})'.format(key, separator)
-        message = re.sub(pattern, r'\1{}\2'.format(redaction), message)
-    return message
+def filter_datum(fields: List[str], redaction: str,
+                 message: str, separator: str) -> str:
+    """ function returns log message obfuscated """
+    msg = re.sub("({})=[^{}]+".format("|".join(fields), separator),
+                 lambda r: "{}={}".format(r.group(1), redaction), message)
+    return msg
 
 
 class RedactingFormatter(logging.Formatter):
     """ Redacting Formatter class
     """
+
     REDACTION = "***"
     FORMAT = "[HOLBERTON] %(name)s %(levelname)s %(asctime)-15s: %(message)s"
     SEPARATOR = ";"
 
-    def __init__(self, fields: List[str]):
-        """
-        Instantiation method, sets fields for each instance
-        """
-        super(RedactingFormatter, self).__init__(self.FORMAT)
+    def __init__(self, fields):
         self.fields = fields
 
+        super(RedactingFormatter, self).__init__(self.FORMAT)
 
     def format(self, record: logging.LogRecord) -> str:
-
-
-def get_logger() -> logging.Logger:
-    """
-    Creates and configures a logger
-    """
-    logger = logging.getLogger('user_data')
-    handler = logging.StreamHandler()
-    handler.setFormatter(RedactingFormatter(fields=PII_FIELDS))
-    logger.setLevel(logging.INFO)
-    logger.propagate = False
-    logger.addHandler(handler)
-    return logger
-
-
-def get_db() -> mysql.connector.connection.MySQLConnection:
-    """
-    Connects to a mysql database
-    """
-    connector = mysql.connector.connect(
-        host=os.getenv('PERSONAL_DATA_DB_HOST'),
-        database=os.getenv('PERSONAL_DATA_DB_NAME'),
-        user=os.getenv('PERSONAL_DATA_DB_USERNAME'),
-        password=os.getenv('PERSONAL_DATA_DB_PASSWORD')
-    )
-    return connector
-
-
-def main() -> None:
-    """
-    Log database users
-    """
-    db = get_db()
-    logger = get_logger()
-    cursor = db.cursor()
-    cursor.execute("SELECT * FROM users")
-    rows = cursor.fetchall()
-    for row in rows:
-        msg = (
-            "name={}; email={}; phone={}; ssn={}; "
-            "password={}; ip={}; last_login={}; user_agent={};"
-        ).format(
-            row[0], row[1], row[2], row[3], row[4], row[5], row[6], row[7])
-        logger.info(msg)
-    cursor.close()
-    db.close()
-
-
-if __name__ == '__main__':
-    main()
-=======
         """ function formats the log message """
         msg = super(RedactingFormatter, self).format(record)
         f_msg = filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
         return f_msg
->>>>>>> 3a7ba463a6b1754cff347ea8b6648283546bc1d6
+
+def get_logger() -> logging.Logger:
+    """ function returns a logging.Logger """
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+    logger.propagate = False
+
+    stream_handler = logger.StreamHandler()
+    stream_handler.setFormatter(RedactingFormatter(PII))
+    logger.addHandler(stream_handler)
+
+    return logger
