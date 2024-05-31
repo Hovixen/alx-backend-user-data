@@ -40,12 +40,8 @@ class RedactingFormatter(logging.Formatter):
         super(RedactingFormatter, self).__init__(self.FORMAT)
         self.fields = fields
 
+
     def format(self, record: logging.LogRecord) -> str:
-        """
-        Formats the LogRecord instance
-        """
-        log = super(RedactingFormatter, self).format(record=record)
-        return filter_datum(self.fields, self.REDACTION, log, self.SEPARATOR)
 
 
 def get_logger() -> logging.Logger:
@@ -96,3 +92,9 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+=======
+        """ function formats the log message """
+        msg = super(RedactingFormatter, self).format(record)
+        f_msg = filter_datum(self.fields, self.REDACTION, msg, self.SEPARATOR)
+        return f_msg
+>>>>>>> 3a7ba463a6b1754cff347ea8b6648283546bc1d6
