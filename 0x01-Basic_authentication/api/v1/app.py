@@ -20,6 +20,10 @@ if auth_inst:
     if auth_inst == "auth":
         from api.v1.auth.auth import Auth
         auth = Auth()
+    
+    elif auth_inst == "basic_auth":
+        from api.v1.auth.basic_auth import BasicAuth
+        auth = BasicAuth()
 
 
 @app.before_request
