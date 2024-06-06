@@ -13,9 +13,9 @@ def login_user():
     email = request.form.get('email')
     password = request.form.get('password')
     if email is None:
-        return jsonify({'error': 'email missing'}), 401
+        return jsonify({'error': 'email missing'}), 400
     if password is None:
-        return jsonify({'error': 'password missing'}), 401
+        return jsonify({'error': 'password missing'}), 400
     User.load_from_file()
     users = User.search({'email': email})
     try:
