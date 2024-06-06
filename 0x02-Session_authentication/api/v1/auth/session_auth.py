@@ -32,4 +32,4 @@ class SessionAuth(Auth):
         for session in self.user_id_by_session_id:
             if req_cookie == session:
                 user_inst = self.user_id_by_session_id[session]
-                return user_inst
+                return User.get(user_inst)
