@@ -2,6 +2,7 @@
 """ session authentication """
 import uuid
 from api.v1.auth.auth import Auth
+from models.user import User
 
 
 class SessionAuth(Auth):
@@ -11,7 +12,7 @@ class SessionAuth(Auth):
         self.user_id_by_session_id = {}
 
     def create_session(self, user_id: str = None) -> str:
-        """ creates sessio id for user """
+        """ creates session id for user """
         if user_id is None or type(user_id) is not str:
             return None
         session_id = str(uuid.uuid4())
@@ -24,3 +25,11 @@ class SessionAuth(Auth):
             return None
         user_id = self.user_id_by_session_id.get(session_id)
         return user_id
+
+    def current_user(self, request=None) -> str:
+        """ retrieves a user instance base on the cookie value """
+        req_cookie = self.session_cookie(request)
+        for session in self.user_id_by_session_id:
+            if req_cookie == session:
+                user_inst = self.user_id_by_session_id[session]
+                return user_inst
