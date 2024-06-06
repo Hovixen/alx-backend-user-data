@@ -36,10 +36,11 @@ def login_user():
 
 @app_views.route('/auth_session/logout',
                  methods=['DELETE'], strict_slashes=False)
-def logout_user():
-    """ logs out the user and delete user session """
+def handle_logout():
+    """
+    Handle user logout
+    """
     from api.v1.app import auth
-    del_session = auth.destroy_session(request)
-    if not del_session:
-        raise abort(404)
-    return jsonify({}), 200
+    if auth.destroy_session(request):
+        return jsonify({}), 200
+    abort(404)
