@@ -90,7 +90,7 @@ class Auth:
         """
         try:
             user = self._db.find_user_by(reset_token=reset_token)
-            new_pwd =  _hash_password(password)
+            new_pwd = _hash_password(password)
             user.hashed_password = new_pwd
             user.reset_token = None
             return None
